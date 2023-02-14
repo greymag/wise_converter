@@ -3,7 +3,7 @@
 Converter utils for Wise.
 
 Features:
-- Convert XML to CVS for batch payments.
+- Convert SEPA XML to CVS for Wise batch payments.
 
 ## Development
 
