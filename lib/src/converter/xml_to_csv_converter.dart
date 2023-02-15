@@ -42,20 +42,52 @@ class XmlToCsvConverter {
       final recipientEmail = '';
 
       const maxPaymentReferenceLen = 35;
-      final restLen = maxPaymentReferenceLen - paymentRefId.length - 1;
+      const taxesCodes = ['TAXS', 'LBRI'];
+      const employeePaymentsCodes = ['SALA', 'PRCP'];
+
       final String paymentReference;
-      if (restLen < 5) {
-        paymentReference = paymentRefId;
-      } else if (paymentDesc.length <= restLen) {
-        paymentReference = paymentDesc + ' ' + paymentRefId;
+
+      if (taxesCodes.contains(purposeCode)) {
+        // For taxes it's important to provide paymentRefId
+        final restLen = maxPaymentReferenceLen - paymentRefId.length - 1;
+        if (restLen >= paymentDesc.length) {
+          paymentReference = paymentDesc + ' ' + paymentRefId;
+        } else if (restLen < 5) {
+          paymentReference = paymentRefId;
+        } else {
+          var modifiedPaymentDesc = paymentDesc;
+          const descMap = {
+            'Prispevek za PIZ': 'PrispevekPIZ',
+            'Prispevek za PPD in PB': 'PrispevekPPDinPB',
+            'Prispevek za STV': 'PrispevekSTV',
+            'Prispevek za ZAP': 'PrispevekZAP',
+            'Prispevek za ZZ': 'PrispevekZZ',
+          };
+
+          for (var prefix in descMap.keys) {
+            if (paymentDesc.startsWith(prefix)) {
+              modifiedPaymentDesc = descMap[prefix]!;
+              break;
+            }
+          }
+
+          if (modifiedPaymentDesc.length <= restLen) {
+            paymentReference = modifiedPaymentDesc + ' ' + paymentRefId;
+          } else {
+            paymentReference =
+                paymentRefId + modifiedPaymentDesc.substring(0, restLen);
+          }
+        }
       } else {
-        paymentReference =
-            paymentDesc.substring(0, restLen) + ' ' + paymentRefId;
+        paymentReference = paymentDesc.length > maxPaymentReferenceLen
+            ? paymentDesc.substring(0, maxPaymentReferenceLen)
+            : paymentDesc;
       }
 
       // TODO: some accurate way to define receiverType (may be Purp + name? or interactive mode for choosing manually)
-      final receiverType =
-          ['SALA', 'PRCP'].contains(purposeCode) ? 'PERSON' : 'INSTITUTION';
+      final receiverType = employeePaymentsCodes.contains(purposeCode)
+          ? 'PERSON'
+          : 'INSTITUTION';
       final amountCurrency = 'source';
       final amount = amountNode.innerText;
       final sourceCurrency = currency;
@@ -104,18 +136,8 @@ class XmlToCsvConverter {
 
 extension _SepaXmlDocumentExtension on XmlDocument {
   XmlElement get root => findAllElements('CstmrCdtTrfInitn').first;
-  XmlElement get header => root.findAllElements('GrpHdr').first;
+  // XmlElement get header => root.findAllElements('GrpHdr').first;
 
   Iterable<XmlElement> getPaymentInformationList() =>
       root.findAllElements('PmtInf');
-
-  // void forEachResource(void Function(XmlElement child) callback) {
-  //   for (final child in resources.children) {
-  //     if (child is XmlElement) callback(child);
-  //   }
-  // }
 }
-
-// extension XmlElementExtension on XmlElement {
-//   String get attributeName => getAttribute('name')!;
-// }
