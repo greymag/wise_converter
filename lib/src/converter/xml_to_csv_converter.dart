@@ -43,7 +43,7 @@ class XmlToCsvConverter {
 
       const maxPaymentReferenceLen = 35;
       const taxesCodes = ['TAXS', 'LBRI'];
-      const employeePaymentsCodes = ['SALA', 'PRCP'];
+      const employeePaymentsCodes = ['SALA', 'PRCP', 'BONU'];
 
       final String paymentReference;
 
