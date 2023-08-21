@@ -1,0 +1,11 @@
+name: wise_toolkit
+description: Toolkit for work with Wise.
+version: 0.1.0
+
+publish_to: 'none'
+
+environment:
+  sdk: '>=2.19.6 <3.0.0'
+
+dev_dependencies:
+  flutter_lints: ^2.0.0
