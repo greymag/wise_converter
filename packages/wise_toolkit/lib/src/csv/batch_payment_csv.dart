@@ -15,7 +15,8 @@ class BatchPaymentCsv {
     String recipientEmail = '',
   }) {
     const maxPaymentReferenceLen = 35;
-    const taxesCodes = ['TAXS', 'LBRI'];
+    // TODO: "Plačilo DDV za: 7-7.2023" short to "PlaciloDDV 7.23 %reference%"
+    const taxesCodes = ['TAXS', 'LBRI', 'VATX'];
     const employeePaymentsCodes = ['SALA', 'PRCP', 'BONU'];
 
     final String paymentReference;
@@ -35,6 +36,7 @@ class BatchPaymentCsv {
           'Prispevek za ZAP': 'PrispevekZAP',
           'Prispevek za ZZ': 'PrispevekZZ',
         };
+        // TODO: Plačilo DDV za: 8.2023 -> PlaciloDDV 8.23 SI1935980621-62006
 
         for (var prefix in descMap.keys) {
           if (paymentDesc.startsWith(prefix)) {
